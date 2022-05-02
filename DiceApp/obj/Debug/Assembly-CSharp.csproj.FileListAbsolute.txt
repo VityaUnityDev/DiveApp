@@ -1,0 +1,2 @@
+/Users/victor.pechurikhin/Documents/DiveApp/DiceApp/obj/Debug/Assembly-CSharp.csproj.AssemblyReference.cache
+/Users/victor.pechurikhin/Documents/DiveApp/DiceApp/obj/Debug/Assembly-CSharp.csproj.CoreCompileInputs.cache
