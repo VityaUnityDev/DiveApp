@@ -345,6 +345,7 @@
 -r:"Library/Bee/artifacts/200b0aEDbg.dag/VSSettingsProvider.ref.dll"
 "Assets/Scripts/Dice.cs"
 "Assets/Scripts/GameManager.cs"
+"Assets/Scripts/MoveCommand.cs"
 "Assets/Scripts/Player.cs"
 "Assets/Scripts/PlayerModel.cs"
 "Assets/Scripts/PlayerPresenter.cs"

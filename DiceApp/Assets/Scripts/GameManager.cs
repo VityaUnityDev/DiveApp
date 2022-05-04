@@ -18,11 +18,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text vityaCurrentMoney;
     [SerializeField] private List<TMP_Text> enemyCurrentMoney;
     [SerializeField] private TMP_Text casinioAmount;
+    [SerializeField] private TMP_Text bank;
 
     [SerializeField] private int percentForCasino;
     private float CasinoAmount;
 
-    public int Bet = 10;
+    public int Bet;
     public int amount;
 
 
@@ -34,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     public event Action<PlayerModel> Player;
 
-    public event Action<int> maxNumber;
+    public event Action<int> MaxNumber;
 
 
     private int countEnter;
@@ -45,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        maxNumber += FinishGame;
+        MaxNumber += FinishGame;
         for (int i = 0; i < 4; i++)
         {
             if (i == 0)
@@ -148,6 +149,11 @@ public class GameManager : MonoBehaviour
         UpdateMoney();
     }
 
+    public void MakeBet(int count)
+    {
+        Bet = count;
+    }
+
 
     private void Result(int result)
     {
@@ -179,7 +185,7 @@ public class GameManager : MonoBehaviour
         if (opponents.Count + 1 == countEnter)
         {
             Debug.Log("Max-" + max);
-            maxNumber?.Invoke(max);
+            MaxNumber?.Invoke(max);
         }
     }
 
@@ -212,10 +218,11 @@ public class GameManager : MonoBehaviour
         CasinoAmount += fees;
         casinioAmount.text = CasinoAmount.ToString();
         var result = amount - fees;
+        Debug.Log(result);
 
         if (countWinner > 1)
         {
-            result = amount / countWinner;
+            result /= countWinner;
         }
 
         
@@ -246,6 +253,6 @@ public class GameManager : MonoBehaviour
 
     private void OnDisable()
     {
-        maxNumber -= FinishGame;
+        MaxNumber -= FinishGame;
     }
 }

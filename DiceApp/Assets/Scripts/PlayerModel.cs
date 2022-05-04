@@ -41,6 +41,9 @@ public class PlayerModel
         {
             EndGame?.Invoke(this);
             Debug.Log("I am loser and bye bye");
+            
+          
+
         }
 
     }
