@@ -22,7 +22,9 @@ public class Dice : MonoBehaviour
 
     private void OnMouseDown()
     {
-        _gameManager.StartGame();
+      //  _gameManager.StartGame();
+        
+        //
     }
 
 

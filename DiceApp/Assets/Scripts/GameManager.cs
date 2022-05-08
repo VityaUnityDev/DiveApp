@@ -10,32 +10,12 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    private int count = 0;
     [SerializeField] private Dice _dice;
-
-    [SerializeField] private TMP_Text vityaDiceCount;
-    [SerializeField] private List<TMP_Text> enemyDiceCount;
-    [SerializeField] private TMP_Text vityaCurrentMoney;
-    [SerializeField] private List<TMP_Text> enemyCurrentMoney;
-    [SerializeField] private TMP_Text casinioAmount;
-    [SerializeField] private TMP_Text bank;
-
-    [SerializeField] private int percentForCasino;
-    private float CasinoAmount;
-
-    public int Bet;
-    public int amount;
-
-
-    private PlayerModel mainPlayer;
-    private List<PlayerModel> opponents = new List<PlayerModel>();
-    private PlayerPresenter _playerPresenter;
+    [SerializeField] private CasinoFees _casinoFees;
+    
     private PlayerModel _playerModel;
-    private PlayerView _playerView;
 
-    public event Action<PlayerModel> Player;
-
-    public event Action<int> MaxNumber;
+    public event Action<int> DiceCount;
 
 
     private int countEnter;
@@ -46,117 +26,46 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        MaxNumber += FinishGame;
         for (int i = 0; i < 4; i++)
         {
-            if (i == 0)
-            {
-                Debug.Log(1);
-                _playerModel = new PlayerModel("vitya", 100);
-                mainPlayer = _playerModel;
-                // Player?.Invoke(mainPlayer);
-            }
-            else
-            {
-                Debug.Log(2);
-                _playerModel = new PlayerModel("opponent" + i, 100);
-                opponents.Add(_playerModel);
-
-                //   Player?.Invoke(_playerModel);
-            }
+            _playerModel = new PlayerModel("opponent" + i, 100);
+            Debug.Log("opponent" + i);
+            GameInfo.Players.Add(_playerModel);
         }
     }
 
-    private void Start()
-    {
-        UpdateMoney();
-    }
-
-    private void UpdateMoney()
-    {
-        vityaCurrentMoney.text = mainPlayer.CurrentMoney.ToString();
-        for (int i = 0; i < opponents.Count; i++)
-        {
-            enemyCurrentMoney[i].text = opponents[i].CurrentMoney.ToString();
-        }
-    }
-
-    private void UpdateDiceCount()
-    {
-        vityaDiceCount.text = mainPlayer.diceCount.ToString();
-        for (int i = 0; i < opponents.Count; i++)
-        {
-            enemyDiceCount[i].text = opponents[i].diceCount.ToString();
-        }
-    }
-
-    private void MakeBet(PlayerModel model)
-    {
-        model.MakeBet(Bet);
-        amount += Bet;
-        Debug.Log(amount);
-    }
-
-    private void MakeNull()
-    {
-        mainPlayer.diceCount = 0;
-        for (int i = 0; i < opponents.Count; i++)
-        {
-            opponents[i].diceCount = 0;
-        }
-
-        UpdateDiceCount();
-    }
-
-
-    public async void StartGame()
-    {
-        MakeNull();
-        amount = 0;
-        MakeBet(mainPlayer);
-        mainPlayer.IsWinner = false;
-        mainPlayer.diceCount = 0;
-        countEnter = 0;
-        first = 0;
-        max = 0;
-        same = 0;
-        var a = await _dice.RollTheDice();
-        Debug.Log($"{mainPlayer.Name} {a} ");
-        mainPlayer.diceCount = a;
-        vityaDiceCount.text = a.ToString();
-        Result(mainPlayer.diceCount);
-        await Task.Delay(1000);
-
-
-        OpponentGame();
-    }
-
-    private async void OpponentGame()
-    {
-        for (int i = 0; i < opponents.Count; i++)
-        {
-            MakeBet(opponents[i]);
-            opponents[i].IsWinner = false;
-            opponents[i].diceCount = 0;
-            var a = await _dice.RollTheDice();
-            Debug.Log($"{opponents[i].Name} {a} ");
-            opponents[i].diceCount = a;
-            enemyDiceCount[i].text = a.ToString();
-            Result(opponents[i].diceCount);
-            await Task.Delay(1000);
-        }
-
-        UpdateMoney();
-    }
 
     public void MakeBet(int count)
     {
-        Bet = count;
+        for (int i = 0; i < GameInfo.Players.Count; i++)
+        {
+            MakeBetCommand makeBetCommand = new MakeBetCommand(GameInfo.Players[i]);
+            makeBetCommand.Execute(true, count);
+        }
+
+        RollDices();
+    }
+
+    private async void RollDices()
+    {
+        for (int i = 0; i < GameInfo.Players.Count; i++)
+        {
+            
+            var number = await _dice.RollTheDice();
+            Debug.Log($"{GameInfo.Players[i].Name} {number} ");
+            GameInfo.Players[i].diceCount = number;
+            DiceCount?.Invoke(number);
+            await Task.Delay(1000);
+            FindMaxDiceNumber(GameInfo.Players[i].diceCount);
+        }
+
+       
     }
 
 
-    private void Result(int result)
+    private void FindMaxDiceNumber(int result)
     {
+        Debug.Log(1);
         countEnter++;
         if (countEnter == 1)
         {
@@ -182,77 +91,31 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (opponents.Count + 1 == countEnter)
+        if (GameInfo.Players.Count == countEnter)
         {
-            Debug.Log("Max-" + max);
-            MaxNumber?.Invoke(max);
+            FinishGame(max);
+            countEnter = 0;
         }
     }
 
     private void FinishGame(int finishNumber)
     {
-        int countWinner = 0;
-        if (mainPlayer.diceCount == finishNumber)
-        {
-            mainPlayer.IsWinner = true;
-            countWinner++;
-        }
-
-        for (int i = 0; i < opponents.Count; i++)
-        {
-            if (opponents[i].diceCount == finishNumber)
-            {
-                opponents[i].IsWinner = true;
-                countWinner++;
-            }
-        }
-
-        Debug.Log("Count winner" + countWinner);
-        EndGame(countWinner);
+        EndGameCommand endGameCommand = new EndGameCommand();
+        endGameCommand.Execute(finishNumber);
+        CountMoney();
     }
 
-    private void EndGame(int countWinner)
+    private void CountMoney()
     {
-       
-        var fees = amount * percentForCasino / 100;
-        CasinoAmount += fees;
-        casinioAmount.text = CasinoAmount.ToString();
-        var result = amount - fees;
-        Debug.Log(result);
-
-        if (countWinner > 1)
-        {
-            result /= countWinner;
-        }
-
-        
-        if (mainPlayer.IsWinner)
-        {
-            mainPlayer.SetWinner(result);
-        }
-        else
-        {
-            mainPlayer.SetLoser(Bet);
-        }
-
-        for (int i = 0; i < opponents.Count; i++)
-        {
-            if (opponents[i].IsWinner)
-            {
-                opponents[i].SetWinner(result);
-            }
-            else
-            {
-                opponents[i].SetLoser(Bet);
-            }
-        }
-
-        UpdateMoney();
+        CountMoneyCommand countMoneyCommand = new CountMoneyCommand();
+        countMoneyCommand.Execute();
+        HandOutMoney();
     }
 
 
-    private void OnDisable()
+    private void HandOutMoney()
     {
-        MaxNumber -= FinishGame;
+        HandOutMoneyCommand moneyCommand = new HandOutMoneyCommand();
+        moneyCommand.Execute();
     }
 }
