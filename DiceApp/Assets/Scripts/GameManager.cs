@@ -10,37 +10,64 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Dice _dice;
-    [SerializeField] private CasinoFees _casinoFees;
+    [SerializeField] private List<Dice> _dices;
+   // [SerializeField] private DiceSecond _secondDice;
+    [SerializeField] private TimeController _timeController;
+    [SerializeField] private List<GameObject> placesInTable;
+    [SerializeField] private GameObject playerPrefab;
     
+    
+    private PlayerPresenter _playerPresenter;
     private PlayerModel _playerModel;
-
-    public event Action<int> DiceCount;
-
-
+    private int result;
     private int countEnter;
     private int first;
     private int max;
     private int same;
 
 
-    private void Awake()
+    public void StartGame()
     {
-        for (int i = 0; i < 4; i++)
+        int i = 0;
+        foreach (var place in placesInTable.ToArray())
         {
-            _playerModel = new PlayerModel("opponent" + i, 100);
-            Debug.Log("opponent" + i);
-            GameInfo.Players.Add(_playerModel);
+            i++;
+            var playerObject = Instantiate(playerPrefab, place.transform);
+            var playerView = playerObject.GetComponent<PlayerView>();
+            if (i == 1)
+            {
+                _playerModel = new PlayerModel("Vitya", 10, 0);
+                _playerPresenter = new PlayerPresenter(playerView, _playerModel);
+                Player mainPlayer = new Player(_playerModel, _playerPresenter);
+                GameInfo.Players.Add(mainPlayer);
+            }
+            else
+            {
+                _playerModel = new PlayerModel("player" + i, 10, 0);
+                _playerPresenter = new PlayerPresenter(playerView, _playerModel);
+                Player player = new Player(_playerModel, _playerPresenter);
+                GameInfo.Players.Add(player);
+            }
         }
     }
-
-
+    
     public void MakeBet(int count)
     {
-        for (int i = 0; i < GameInfo.Players.Count; i++)
+        if (GameInfo.MadeBet == false)
         {
-            MakeBetCommand makeBetCommand = new MakeBetCommand(GameInfo.Players[i]);
-            makeBetCommand.Execute(true, count);
+            for (int i = 1; i < GameInfo.Players.Count; i++)
+            {
+                MakeBetCommand makeBetCommand = new MakeBetCommand(GameInfo.Players[i]);
+                makeBetCommand.Execute(true, count);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < GameInfo.Players.Count; i++)
+            {
+                MakeBetCommand makeBetCommand = new MakeBetCommand(GameInfo.Players[i]);
+                makeBetCommand.Execute(true, count);
+            }
         }
 
         RollDices();
@@ -48,24 +75,43 @@ public class GameManager : MonoBehaviour
 
     private async void RollDices()
     {
-        for (int i = 0; i < GameInfo.Players.Count; i++)
+        if (GameInfo.MadeBet == false)
         {
-            
-            var number = await _dice.RollTheDice();
-            Debug.Log($"{GameInfo.Players[i].Name} {number} ");
-            GameInfo.Players[i].diceCount = number;
-            DiceCount?.Invoke(number);
-            await Task.Delay(1000);
-            FindMaxDiceNumber(GameInfo.Players[i].diceCount);
-        }
+            for (int i = 1; i < GameInfo.Players.Count; i++)
+            {
+                foreach (var dice in _dices)
+                {
+                    var count = await  dice.RollTheDice();
+                    result += count;
 
-       
+                }
+                // var number = await _dice.RollTheDice();
+                // var number2 = await _secondDice.RollTheDice();
+                StartGameCommand startGameCommand = new StartGameCommand(GameInfo.Players[i]);
+               // var result = number + number2;
+             //   startGameCommand.Execute(result);
+                await Task.Delay(1000);
+               // FindMaxDiceNumber(result);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < GameInfo.Players.Count; i++)
+            {
+                // var number = await _dice.RollTheDice();
+                // var number2 = await _secondDice.RollTheDice();
+                StartGameCommand startGameCommand = new StartGameCommand(GameInfo.Players[i]);
+             //   var result = number + number2;
+               // startGameCommand.Execute(result);
+                await Task.Delay(1000);
+              //  FindMaxDiceNumber(result);
+            }
+        }
     }
 
 
     private void FindMaxDiceNumber(int result)
     {
-        Debug.Log(1);
         countEnter++;
         if (countEnter == 1)
         {
@@ -91,15 +137,29 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (GameInfo.Players.Count == countEnter)
+        if (GameInfo.MadeBet)
         {
-            FinishGame(max);
-            countEnter = 0;
+            if (GameInfo.Players.Count == countEnter)
+            {
+                FinishGame(max);
+                countEnter = 0;
+            }
         }
+        else
+        {
+            if (GameInfo.Players.Count -1 == countEnter)
+            {
+                FinishGame(max);
+                countEnter = 0;
+            }
+        }
+
+      
     }
 
     private void FinishGame(int finishNumber)
     {
+        Debug.Log(finishNumber);
         EndGameCommand endGameCommand = new EndGameCommand();
         endGameCommand.Execute(finishNumber);
         CountMoney();

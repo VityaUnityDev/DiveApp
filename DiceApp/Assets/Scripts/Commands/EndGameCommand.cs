@@ -8,16 +8,34 @@ public class EndGameCommand : MonoBehaviour
     public void Execute(int winNumber)
     {
         int countWinner = 0;
-        for (int i = 0; i < GameInfo.Players.Count; i++)
+        if (GameInfo.MadeBet == false)
         {
-            if (GameInfo.Players[i].diceCount == winNumber)
+            for (int i = 1; i < GameInfo.Players.Count; i++)
             {
-                GameInfo.Players[i].IsWinner = true;
-                countWinner++;
+                if (GameInfo.Players[i]._playerModel.DiceCount == winNumber)
+                {
+                    GameInfo.Players[i]._playerModel.IsWinner = true;
+                    countWinner++;
+                }
             }
+            GameInfo.CountWinner = countWinner;
+            Debug.Log("Count winner" + countWinner);
         }
-        GameInfo.CountWinner = countWinner;
-        Debug.Log("Count winner" + countWinner);
+        else
+        {
+            for (int i = 0; i < GameInfo.Players.Count; i++)
+            {
+                if (GameInfo.Players[i]._playerModel.DiceCount == winNumber)
+                {
+                    GameInfo.Players[i]._playerModel.IsWinner = true;
+                    countWinner++;
+                }
+            }
+            GameInfo.CountWinner = countWinner;
+            Debug.Log("Count winner" + countWinner);
+        }
+
+      
         
     }
     

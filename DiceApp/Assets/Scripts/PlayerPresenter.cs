@@ -6,58 +6,53 @@ using UnityEngine;
 
 public class PlayerPresenter : MonoBehaviour
 {
-    [SerializeField] PlayerView _playerView;
-    [SerializeField] private GameManager _gameManager;
-
+    private PlayerView _playerView;
     private PlayerModel _playerModel;
 
-    public PlayerPresenter(PlayerView view, GameManager model)
+
+    public PlayerPresenter(PlayerView view, PlayerModel model)
     {
         _playerView = view;
-        _gameManager = model;
-    }
-    
-    public void Enable()
-    {
-        // _playerModel.Lose += Lose;
-        // _playerModel.ChangeMoney += ChangeHealth;
+        _playerModel = model;
     }
 
-    public void Start()
-    {
-        _playerView.OnMadeBet += MadeBet;
-        _gameManager.DiceCount += DiceNumber;
-        _playerModel.ChangeCurrentMoney += CurrentMoney;
 
-    }
-
-    private void  CurrentMoney(int  currentMoney)
+    private void Start()
     {
-        _playerView.InfoAboutMoney(currentMoney);
-    }
-
-    private void MadeBet(int count)
-    {
-        _gameManager.MakeBet(count);
-        GameInfo.Bet = count;
-    }
-
-    private void DiceNumber(int count)
-    {
-        _playerView.InfoAboutDice(count);
-    }
-    
-    
-
-    public void Disable()
-    {
+        _playerModel.OnUpdatedMoney += ChangeMoney;
        
     }
 
+    public void PlayerName(string name)
+    {
+        _playerView.Name(name);
+    }
+
+    public void ChangeMoney(int count)
+    {
+        _playerView.ChangeMoney(count);
+    }
+
+    public void DiceCount(int dice)
+    {
+        _playerView.DiceCount(dice);
+    }
+
+    public void EndGame()
+    {
+        Debug.Log("end");
+        _playerView.EndGame();
+    }
+    
+
+    public void ClearInfoAboutDice()
+    {
+        _playerView.ClearDice();
+    }
+
+
     private void OnDestroy()
     {
-        _playerView.OnMadeBet -= MadeBet;
-        _gameManager.DiceCount -= DiceNumber;
-        _playerModel.ChangeCurrentMoney -= CurrentMoney;
+        _playerModel.OnUpdatedMoney -= ChangeMoney;
     }
 }

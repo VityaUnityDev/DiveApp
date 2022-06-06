@@ -1,58 +1,59 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerModel 
+public class PlayerModel
 {
     public string Name { get; set; }
-    public int diceCount { get;  set; }
-    public int CurrentMoney { get; private set; }
+    public int DiceCount { get; set; }
+    public int CurrentMoney { get; set; }
     public bool IsWinner = false;
+    public bool playGame = true;
 
-    public event Action<int> ChangeCurrentMoney;
-    public event Action<PlayerModel> EndGame;
-    public event Action Win;
+    public bool TheEnd = false;
     
-    public event Action<int> ChangeMoney;
+    public event Action<int> OnUpdatedMoney;
 
 
-    public PlayerModel(string name, int money)
+    public PlayerModel(string name, int money, int diceCount)
     {
         Name = name;
         CurrentMoney = money;
+        DiceCount = diceCount;
     }
 
     public void MakeBet(int bet)
     {
-        CurrentMoney -= bet;
-        Debug.Log(CurrentMoney);
-    }
-
-    public void SetLoser(int amount) // перерабоать под пкомментированное условие
-    {
-        if (CurrentMoney > 0)
+        if (CurrentMoney >= bet)
         {
-            CurrentMoney -= amount;
-            Debug.Log($" {Name} {diceCount}  is loser number - Lose {amount} - currentMoney {CurrentMoney}");
-            ChangeCurrentMoney?.Invoke(CurrentMoney);
+            playGame = true;
+            CurrentMoney -= bet;
+            Debug.Log(CurrentMoney);
         }
         else
         {
-            EndGame?.Invoke(this);
-            Debug.Log("I am loser and bye bye");
+            playGame = false;
         }
 
+    
     }
 
-    
+    public void SetLoser(int amount) 
+    {
+        if (CurrentMoney > 0)
+        {
+            Debug.Log($" {Name} {DiceCount}  is loser number - Lose {amount} - currentMoney {CurrentMoney}");
+        }
+        else if (CurrentMoney <= 0)
+        {
+            TheEnd = true;
+            Debug.Log("I am loser and bye bye");
+        }
+    }
+
+
     public void SetWinner(int amount)
     {
         CurrentMoney += amount;
-        Debug.Log($" {Name} {diceCount}  is winner number - Win { amount} - currentMoney {CurrentMoney}");
-        ChangeCurrentMoney?.Invoke(CurrentMoney);
+        Debug.Log($" {Name} {DiceCount}  is winner number - Win {amount} - currentMoney {CurrentMoney}");
     }
-    
-
-
 }

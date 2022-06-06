@@ -7,7 +7,7 @@ using UnityEngine;
 public class Dice : MonoBehaviour
 {
     
-    private Sprite[] diceSides;
+    [SerializeField] Sprite[] firstDice;
     private SpriteRenderer rend;
     [SerializeField] private GameManager _gameManager;
 
@@ -17,17 +17,9 @@ public class Dice : MonoBehaviour
     private void Start()
     {
         rend = GetComponent<SpriteRenderer>();
-        diceSides = Resources.LoadAll<Sprite>("DiceSides/");
+
     }
-
-    private void OnMouseDown()
-    {
-      //  _gameManager.StartGame();
-        
-        //
-    }
-
-
+    
     public async Task<int> RollTheDice()
     {
         int randomDiceSide = 0;
@@ -35,7 +27,7 @@ public class Dice : MonoBehaviour
         for (int i = 0; i <= 20; i++)
         {
             randomDiceSide = Random.Range(1, 6);
-            rend.sprite = diceSides[randomDiceSide];
+            rend.sprite = firstDice[randomDiceSide];
             await Task.Delay(50);
         }
 

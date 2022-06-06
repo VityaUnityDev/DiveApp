@@ -7,50 +7,43 @@ using UnityEngine.UI;
 
 public class PlayerView : MonoBehaviour
 {
-    [SerializeField] private Button Bet10;
-    [SerializeField] private TMP_Text bank;
+    [SerializeField] private GameObject photo;
+    [SerializeField] private TMP_Text name;
+    [SerializeField] private TMP_Text currentMoney;
+    [SerializeField] private TMP_Text currentDice;
+    
 
-    [SerializeField] private List<TMP_Text> dices;
-    [SerializeField] private List<TMP_Text> currentMoney;
-    public event Action<int> OnMadeBet;
-
-    private int enterDices = 0;
-    private int enterMoney = 0;
-
-    private void Start()
+    public void ChangeMoney(int count)
     {
-        Bet10.onClick.AddListener(() => MakeBet10(10));
+        currentMoney.text = count.ToString();
     }
 
-    private void MakeBet10(int bet)
+    public void DiceCount(int count)
     {
-        OnMadeBet?.Invoke(bet);
-        var amount = bet * 4;
-        bank.text = amount.ToString();
-        ClearResult();
+        currentDice.text = count.ToString();
     }
 
-    private void ClearResult()
+    public void Name(string player)
     {
-        for (int i = 0; i < dices.Count; i++)
-        {
-            var a = 0;
-            dices[i].text = a.ToString();
-            enterDices = 0;
-            enterMoney = 0;
-
-        }
+        name.text = player.ToString(); 
     }
 
-    public void InfoAboutDice(int number)
+    public void EndGame()
     {
-        enterDices++;
-        dices[enterDices - 1].text = number.ToString();
+       name.gameObject.SetActive(false); 
+       currentMoney.gameObject.SetActive(false); 
+       currentDice.gameObject.SetActive(false);
+    }
+    
+    public void ClearDice()
+    {
+        var update = 0;
+        currentDice.text = update.ToString();
     }
 
-    public void InfoAboutMoney(int money)
-    {
-        enterMoney++;
-        currentMoney[enterMoney - 1].text = money.ToString();
-    }
+  
+
+
+
+
 }
