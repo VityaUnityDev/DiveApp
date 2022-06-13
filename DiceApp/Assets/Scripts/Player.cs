@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     public PlayerView playerView;
 
     public string Name;
-    public int CurrentMoney;
+    public float CurrentMoney;
     public int DiceCount;
 
     public Player(PlayerModel model, PlayerPresenter presenter)

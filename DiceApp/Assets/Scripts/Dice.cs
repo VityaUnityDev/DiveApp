@@ -9,7 +9,6 @@ public class Dice : MonoBehaviour
     
     [SerializeField] Sprite[] firstDice;
     private SpriteRenderer rend;
-    [SerializeField] private GameManager _gameManager;
 
     public BoxCollider2D _collider2D;
 

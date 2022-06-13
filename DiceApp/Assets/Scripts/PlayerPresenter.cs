@@ -28,7 +28,7 @@ public class PlayerPresenter : MonoBehaviour
         _playerView.Name(name);
     }
 
-    public void ChangeMoney(int count)
+    public void ChangeMoney(float count)
     {
         _playerView.ChangeMoney(count);
     }
@@ -40,7 +40,6 @@ public class PlayerPresenter : MonoBehaviour
 
     public void EndGame()
     {
-        Debug.Log("end");
         _playerView.EndGame();
     }
     
@@ -48,6 +47,11 @@ public class PlayerPresenter : MonoBehaviour
     public void ClearInfoAboutDice()
     {
         _playerView.ClearDice();
+    }
+
+    public void InstallPhoto(Sprite image)
+    {
+        _playerView.InstallPhoto(image);
     }
 
 

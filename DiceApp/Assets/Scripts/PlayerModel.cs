@@ -1,17 +1,21 @@
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PlayerModel
 {
     public string Name { get; set; }
     public int DiceCount { get; set; }
-    public int CurrentMoney { get; set; }
+    public float CurrentMoney { get; set; }
     public bool IsWinner = false;
     public bool playGame = true;
 
+
+    private float probability = 10;
+    private float lastBet;
     public bool TheEnd = false;
-    
-    public event Action<int> OnUpdatedMoney;
+
+    public event Action<float> OnUpdatedMoney;
 
 
     public PlayerModel(string name, int money, int diceCount)
@@ -21,23 +25,46 @@ public class PlayerModel
         DiceCount = diceCount;
     }
 
-    public void MakeBet(int bet)
+    public void MakeBet(float bet)
     {
         if (CurrentMoney >= bet)
         {
             playGame = true;
             CurrentMoney -= bet;
-            Debug.Log(CurrentMoney);
+            LeaveGame(bet);
         }
         else
         {
             playGame = false;
+            Debug.Log(CurrentMoney);
         }
 
     
     }
 
-    public void SetLoser(int amount) 
+    private void LeaveGame(float bet)
+    {
+        if (lastBet != bet)
+        {
+            var a = Random.Range(0, 10) * probability;
+            if (a > 80 )
+            {
+                playGame = false;
+                GameInfo.Result -= bet;
+                Debug.Log(GameInfo.Result);
+                CurrentMoney += bet;
+                Debug.Log(CurrentMoney);
+            }
+            else
+            {
+                playGame = true;
+            }
+        }
+
+        lastBet = bet;
+    }
+
+    public void SetLoser(float amount)
     {
         if (CurrentMoney > 0)
         {
@@ -51,7 +78,7 @@ public class PlayerModel
     }
 
 
-    public void SetWinner(int amount)
+    public void SetWinner(float amount)
     {
         CurrentMoney += amount;
         Debug.Log($" {Name} {DiceCount}  is winner number - Win {amount} - currentMoney {CurrentMoney}");

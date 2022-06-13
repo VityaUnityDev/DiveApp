@@ -2,18 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerView : MonoBehaviour
 {
-    [SerializeField] private GameObject photo;
+    [SerializeField] public Image photo;
     [SerializeField] private TMP_Text name;
     [SerializeField] private TMP_Text currentMoney;
     [SerializeField] private TMP_Text currentDice;
-    
 
-    public void ChangeMoney(int count)
+
+    public void InstallPhoto(Sprite image)
+    {
+        photo.sprite = image;
+    }
+    public void ChangeMoney(float count)
     {
         currentMoney.text = count.ToString();
     }
@@ -30,7 +35,8 @@ public class PlayerView : MonoBehaviour
 
     public void EndGame()
     {
-       name.gameObject.SetActive(false); 
+       name.gameObject.SetActive(false);
+       photo.sprite = null;
        currentMoney.gameObject.SetActive(false); 
        currentDice.gameObject.SetActive(false);
     }

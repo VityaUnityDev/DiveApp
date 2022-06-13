@@ -9,61 +9,53 @@ using Random = UnityEngine.Random;
 
 public class GameView : MonoBehaviour
 {
-    [SerializeField] private Button Bet10;
-
     [SerializeField] private GameManager _gameManager;
+
     [SerializeField] private TMP_Text bank;
     [SerializeField] private TMP_Text currentTimeText;
-
-    [SerializeField] private Slider _slider;
+    [SerializeField] private TMP_Text winnerText;
+    [SerializeField] private TMP_Text bankPercent;
     [SerializeField] private TMP_Text countBet;
 
+    [SerializeField] private Slider _slider;
 
     [SerializeField] private Button MaxBet5;
     [SerializeField] private Button MaxBet10;
+    [SerializeField] private Button Bet10;
 
+    [SerializeField] private Toggle autoBet;
 
-    [SerializeField] private TMP_Text winnerText;
     [SerializeField] private GameObject winnerPanel;
-    [SerializeField] private TimeController _timeController;
+    [SerializeField] float startMinutes = 0.085f;
 
-    [SerializeField] private TMP_Text bankPercent;
 
-    public bool timetActive;
+    public bool timerActive;
     public float currentTime;
-    public float startMinutes = 0.085f;
+
 
     private void Awake()
     {
         MaxBet5.onClick.AddListener(() => MaxBetInGame(5));
         MaxBet10.onClick.AddListener(() => MaxBetInGame(10));
+        Bet10.onClick.AddListener(() => Bet((int) _slider.value));
+        _slider.onValueChanged.AddListener((v) => { countBet.text = _slider.value.ToString(); });
 
         GameInfo.Winner += FinishTable;
         GameInfo.Fees += UpdateFees;
-
-
-        Bet10.onClick.AddListener(() => Bet((int) _slider.value));
-
-        _slider.onValueChanged.AddListener((v) => { countBet.text = _slider.value.ToString(); });
     }
 
-    private void Start()
-    {
-        currentTime = startMinutes * 60;
-    }
+  
+  
 
     private void FinishTable(Player player)
     {
-        timetActive = false;
+        timerActive = false;
         winnerPanel.SetActive(true);
         winnerText.text = player.Name + " Is winner";
-      
-
     }
 
     private void MaxBetInGame(int maxValue)
     {
-        
         _gameManager.StartGame();
         if (maxValue == 10)
         {
@@ -76,13 +68,12 @@ public class GameView : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("time active" + timetActive);
-        if (timetActive)
+        if (timerActive)
         {
             currentTime -= Time.deltaTime;
             if (currentTime <= 0)
             {
-                Skip();
+               CheckAvtoGame();
                 Start();
                 currentTime = startMinutes * 60;
             }
@@ -98,42 +89,54 @@ public class GameView : MonoBehaviour
         }
     }
 
-
-    public void StartTimer()
+    private void CheckAvtoGame()
     {
-        timetActive = true;
+        if (autoBet.isOn)
+        {
+            Bet((int)_slider.value);
+        }
+        else
+        {
+            Skip();
+        }
     }
 
-    public void StopTimer()
-    {
-        timetActive = false;
-    }
+
 
     private void Bet(int bet)
     {
         Start();
-        StopTimer();
         GameInfo.MadeBet = true;
-        Bet10.enabled = false;
-        _gameManager.MakeBet(bet);
         var amount = bet * GameInfo.Players.Count;
+        GameWasStarted(bet, amount);
+    }
+
+    private void Skip()
+    {
+        GameInfo.MadeBet = false;
+        var randomBet = (int) Random.Range(_slider.minValue, _slider.maxValue);
+        var amount = randomBet * (GameInfo.Players.Count - 1);
+        GameWasStarted(randomBet, amount);
+    }
+
+    
+    private void GameWasStarted(int bet, int amount)
+    {
+        StopTimer();
+        Bet10.enabled = false;
+        GameInfo.Bet = bet;
+        _gameManager.CountPlayerInGame();
         bank.text = "Bank " + amount;
     }
 
-    public void Skip()
+    private void UpdateFees(float count) =>   bankPercent.text = "Bank fees - " + count;
+    public void StartTimer() => timerActive = true;
+    private void StopTimer() => timerActive = false;
+    private void Start() =>   currentTime = startMinutes * 60;
+
+    private void OnDestroy()
     {
-        StopTimer();
-        Bet10.enabled = false;
-        GameInfo.MadeBet = false;
-     
-       var randomBet = (int)Random.Range(_slider.minValue, _slider.maxValue);
-        _gameManager.MakeBet(randomBet);
-        var amount = randomBet * (GameInfo.Players.Count - 1);
-        bank.text = "Bank " + amount;
-    }
-    
-    private void UpdateFees(int count)
-    {
-        bankPercent.text = "Bank fees -" + count;
+        GameInfo.Winner -= FinishTable;
+        GameInfo.Fees -= UpdateFees;
     }
 }

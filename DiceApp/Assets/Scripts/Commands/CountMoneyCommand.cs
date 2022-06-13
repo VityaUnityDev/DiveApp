@@ -4,28 +4,20 @@ using UnityEngine;
 
 public class CountMoneyCommand : MonoBehaviour
 {
-    public int amount;
+    public float amount;
     private float CasinoAmount;
     private int percentForCasino = 10;
 
-    public void Execute()
+    public void Execute(int fromCountNumber)
     {
-        if (GameInfo.MadeBet)
-        {
-            amount = GameInfo.Bet * GameInfo.Players.Count;
-           
-        }
-        else
-        {
-            amount = GameInfo.Bet * Mathf.Abs(GameInfo.Players.Count - 1);
-        }
+        amount = GameInfo.Bet *
+                 Mathf.Abs(GameInfo.Players.Count - fromCountNumber); //отнимем 0 или 1 тем самым узнаем сколько игроков
+
         var fees = amount * percentForCasino / 100;
         CasinoAmount += fees;
-        GameInfo.OnGetFees((int)CasinoAmount);
+        GameInfo.OnGetFees(CasinoAmount);
         var result = amount - fees;
 
-      
-        
 
         if (GameInfo.CountWinner > 1)
         {

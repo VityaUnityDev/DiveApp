@@ -5,36 +5,32 @@ using UnityEngine;
 
 public class MakeBetCommand : MonoBehaviour
 {
-    private Player Player;
-
-
-    public MakeBetCommand(Player player)
-    {
-        Player = player;
-    }
-
-    public void Execute(bool isMadeBet, int bet)
+    public void Execute(int fromCountNumber)
     {
         GameInfo.finishGame = false;
-        if (isMadeBet)
+
+        for (int i = fromCountNumber; i < GameInfo.Players.Count; i++)
         {
-            Player._playerModel.MakeBet(bet);
-          
-            for (int i = 0; i < GameInfo.Players.Count; i++)
+            GameInfo.Players[i]._playerModel.MakeBet(GameInfo.Bet);
+            if (GameInfo.Players[i]._playerModel.playGame )
             {
-                if (GameInfo.Players[i]._playerModel.playGame)
-                {
-                    GameInfo.Players[i].playerPresenter.ChangeMoney( GameInfo.Players[i]._playerModel.CurrentMoney);
-                    GameInfo.Players[i].playerPresenter.ClearInfoAboutDice();
-                }
-                else
-                {
-                    GameInfo.Players[i].playerPresenter.EndGame();
-                    GameInfo.Players.RemoveAt(i);
-                    i--;
-                }
+                GameInfo.Players[i].playerPresenter.ChangeMoney(GameInfo.Players[i]._playerModel.CurrentMoney);
+                GameInfo.Players[i].playerPresenter.ClearInfoAboutDice();
             }
-            GameInfo.Bet = bet;
+            
+            else
+            {
+                GameInfo.Players[i].playerPresenter.EndGame();
+                GameInfo.Players.Remove(GameInfo.Players[i]);
+                i--;
+                Debug.Log("Player COunt" + GameInfo.Players.Count); // не унитожаются префабы посмотреть
+            }
+        }
+        
+        if( GameInfo.Players.Count <= 1 )
+        {
+            GameInfo.OnGetWinner(GameInfo.Players[0]);
+            GameInfo.Players.Clear();
         }
     }
 }
