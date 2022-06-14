@@ -1,22 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class EndGameCommand : MonoBehaviour
+public class EndGameCommand : AbstractCommand
 {
-    public void Execute(int winNumber, int fromCountNumber)
+    public override void Execute()
     {
         int countWinner = 0;
-        for (int i = fromCountNumber; i < GameInfo.Players.Count; i++)
+        foreach (var player in GameInfo.PlayersInCurrentGame.Values.ToArray())
         {
-            if (GameInfo.Players[i]._playerModel.DiceCount == winNumber)
+            if (player._playerModel.DiceCount == GameInfo.winnerNumber)
             {
-                GameInfo.Players[i]._playerModel.IsWinner = true;
+                player._playerModel.IsWinner = true;
                 countWinner++;
             }
         }
-
+        
         GameInfo.CountWinner = countWinner;
-        Debug.Log("Count winner" + countWinner);
+       
     }
+    
 }

@@ -12,13 +12,7 @@ using Random = UnityEngine.Random;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private List<Dice> _dices;
-    [SerializeField] private List<GameObject> placesInTable;
-    [SerializeField] private List<Sprite> playerIcons;
-    [SerializeField] private PlayerView playerPrefab;
 
-
-    private PlayerPresenter _playerPresenter;
-    private PlayerModel _playerModel;
 
     private int result;
     private int countEnter;
@@ -27,58 +21,31 @@ public class GameManager : MonoBehaviour
     private int same;
 
 
-    public void StartGame()
+    public void CountPlayerInGame()
     {
-        int i = 0;
-        foreach (var place in placesInTable.ToArray())
-        {
-            i++;
-            var playerObject = Instantiate(playerPrefab, place.transform);
+        CountPlayerInGameCommand countPlayerInGameCommand = new CountPlayerInGameCommand();
+        countPlayerInGameCommand.Execute();
 
-            if (i == 1)
-            {
-                CreatePlayer(playerObject, "Vitya", 10, 0);
-            }
-            else
-            {
-                CreatePlayer(playerObject, "player" + i, 10, 0);
-            }
-        }
+        MakeBet();
+        CountBetInGame();
+        RollDices();
     }
 
-    private void CreatePlayer(PlayerView playerView, string playerName, int money, int diceCount)
+    private void CountBetInGame()
     {
-        _playerModel = new PlayerModel(playerName, money, diceCount);
-        _playerPresenter = new PlayerPresenter(playerView, _playerModel);
-        Player player = new Player(_playerModel, _playerPresenter);
-        GameInfo.Players.Add(player);
-        EditPlayer(player, playerIcons[0]);
-        playerIcons.RemoveAt(0);
+        CountBetCommand countBetCommand = new CountBetCommand();
+        countBetCommand.Execute();
     }
 
-    public void CountPlayerInGame() // для mvp чтобы выкинуть главного игрока со стола 
-    {
-        if (GameInfo.MadeBet == false)
-        {
-            MakeBet(1);
-            RollDices(1);
-        }
-        else
-        {
-            MakeBet(0);
-            RollDices(0);
-        }
-    }
-
-    private void MakeBet(int fromCountNumber) // передаю значение с которого начать отсчет
+    private void MakeBet()
     {
         MakeBetCommand makeBetCommand = new MakeBetCommand();
-        makeBetCommand.Execute(fromCountNumber);
+        makeBetCommand.Execute();
     }
 
-    private async void RollDices(int fromCountNumber)
+    private async void RollDices()
     {
-        for (int i = fromCountNumber; i < GameInfo.Players.Count; i++)
+        for (int i = 0; i < GameInfo.PlayersInCurrentGame.Count; i++)
         {
             int diceResult = 0;
             foreach (var dice in _dices)
@@ -87,74 +54,73 @@ public class GameManager : MonoBehaviour
                 diceResult += count;
             }
 
-            StartGameCommand startGameCommand = new StartGameCommand(GameInfo.Players[i]);
-            startGameCommand.Execute(diceResult);
+            var player = GameInfo.PlayersInCurrentGame.ElementAt(i);
+            GameInfo.PlayerResult(player.Value, diceResult);
             await Task.Delay(1000);
-            FindMaxDiceNumber(diceResult, fromCountNumber);
+            FindMaxDiceNumber(diceResult);
         }
     }
 
 
-    private void FindMaxDiceNumber(int result, int fromCountNumber)
+    private void FindMaxDiceNumber(int res)
     {
         countEnter++;
         if (countEnter == 1)
         {
-            first = result;
+            first = res;
             max = first;
         }
         else
         {
-            if (first > result)
+            if (first > res)
             {
                 first = max;
             }
-            else if (first == result)
+            else if (first == res)
             {
-                same = result;
+                same = res;
                 max = same;
                 first = max;
             }
-            else if (first < result)
+            else if (first < res)
             {
-                first = result;
-                max = result;
+                first = res;
+                max = res;
             }
         }
 
-        if (GameInfo.Players.Count - fromCountNumber ==
-            countEnter) // отнимем 0 или 1 тем самым узнаем сколько максимальных чиспел
+        StopCountMaxNumber();
+    }
+
+    private void StopCountMaxNumber()
+    {
+        if (GameInfo.PlayersInCurrentGame.Count == countEnter)
         {
-            FinishGame(max, fromCountNumber);
+            GameInfo.winnerNumber = max;
+            FinishGame();
             countEnter = 0;
         }
     }
 
 
-    private void EditPlayer(Player player, Sprite image)
-    {
-        EditPlayerCommand editPlayerCommand = new EditPlayerCommand(player);
-        editPlayerCommand.Execute(image);
-    }
-
-    private void FinishGame(int finishNumber, int fromCountNumber)
+    private void FinishGame()
     {
         EndGameCommand endGameCommand = new EndGameCommand();
-        endGameCommand.Execute(finishNumber, fromCountNumber);
-        CountMoney(fromCountNumber);
+        endGameCommand.Execute();
+        CountMoney();
     }
 
-    private void CountMoney(int fromCountNumber)
+    private void CountMoney()
     {
         CountMoneyCommand countMoneyCommand = new CountMoneyCommand();
-        countMoneyCommand.Execute(fromCountNumber);
-        HandOutMoney(fromCountNumber);
+        countMoneyCommand.Execute();
+        HandOutMoney();
     }
 
 
-    private void HandOutMoney(int fromCountNumber)
+    private void HandOutMoney()
     {
         HandOutMoneyCommand moneyCommand = new HandOutMoneyCommand();
-        moneyCommand.Execute(fromCountNumber);
+        moneyCommand.Execute();
     }
 }

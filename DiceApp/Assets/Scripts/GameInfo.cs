@@ -3,12 +3,13 @@ using System.Collections.Generic;
 
 public static class GameInfo
 {
-    public static List<Player> Players = new List<Player>();
+    public static Dictionary<string, Player> Players = new Dictionary<string, Player>();
+    public static Dictionary<string, Player> PlayersInCurrentGame = new Dictionary<string, Player>();
     public static int CountWinner;
+    public static int winnerNumber;
     public static float Bet;
     public static float Result;
     public static bool finishGame = false;
-    public static bool MadeBet;
 
     private static float bankFees = 0;
 
@@ -24,5 +25,12 @@ public static class GameInfo
     {
         bankFees += count;
         Fees?.Invoke(bankFees);
+    }
+
+
+    public static void PlayerResult(Player player, int diceResult)
+    {
+        player._playerModel.DiceCount = diceResult;
+        player.playerPresenter.DiceCount(diceResult);
     }
 }

@@ -1,35 +1,39 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class MakeBetCommand : MonoBehaviour
+public class MakeBetCommand : AbstractCommand
 {
-    public void Execute(int fromCountNumber)
+    public override void Execute()
     {
         GameInfo.finishGame = false;
 
-        for (int i = fromCountNumber; i < GameInfo.Players.Count; i++)
+        for (int i = 0; i < GameInfo.PlayersInCurrentGame.Values.Count; i++)
         {
-            GameInfo.Players[i]._playerModel.MakeBet(GameInfo.Bet);
-            if (GameInfo.Players[i]._playerModel.playGame )
+           
+            GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.MakeBet();
+            if (GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.playGame)
             {
-                GameInfo.Players[i].playerPresenter.ChangeMoney(GameInfo.Players[i]._playerModel.CurrentMoney);
-                GameInfo.Players[i].playerPresenter.ClearInfoAboutDice();
+                GameInfo.PlayersInCurrentGame.ElementAt(i).Value.playerPresenter.ChangeMoney();
             }
-            
+
             else
             {
-                GameInfo.Players[i].playerPresenter.EndGame();
-                GameInfo.Players.Remove(GameInfo.Players[i]);
+                GameInfo.PlayersInCurrentGame.ElementAt(i).Value.playerPresenter.EndGame();
+                var pl = GameInfo.PlayersInCurrentGame.ElementAt(i).Key;
+                GameInfo.PlayersInCurrentGame.Remove(pl);
+                GameInfo.Players.Remove(pl);
                 i--;
                 Debug.Log("Player COunt" + GameInfo.Players.Count); // не унитожаются префабы посмотреть
             }
         }
-        
-        if( GameInfo.Players.Count <= 1 )
+
+
+        if (GameInfo.Players.Count <= 1) // если закончились деньги у всех
         {
-            GameInfo.OnGetWinner(GameInfo.Players[0]);
+            GameInfo.OnGetWinner(GameInfo.Players.ElementAt(0).Value);
             GameInfo.Players.Clear();
         }
     }

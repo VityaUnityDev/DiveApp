@@ -1,38 +1,56 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class HandOutMoneyCommand : MonoBehaviour
+public class HandOutMoneyCommand : AbstractCommand
 {
-    public void Execute(int fromCountNumber)
+    public override void Execute()
     {
-        for (int i = fromCountNumber; i < GameInfo.Players.Count; i++)
+        for (int i = 0; i < GameInfo.PlayersInCurrentGame.Values.Count; i++)
         {
-            if (GameInfo.Players[i]._playerModel.IsWinner)
+            UpdatePlayerInfo(GameInfo.PlayersInCurrentGame.ElementAt(i).Value);
+            
+            if (GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.TheEnd)
             {
-                GameInfo.Players[i]._playerModel.SetWinner(GameInfo.Result);
-                GameInfo.Players[i]._playerModel.IsWinner = false;
-                GameInfo.Players[i].playerPresenter.ChangeMoney(GameInfo.Players[i]._playerModel.CurrentMoney);
-            }
-            else
-            {
-                GameInfo.Players[i]._playerModel.SetLoser(0);
-                GameInfo.Players[i].playerPresenter.ChangeMoney(GameInfo.Players[i]._playerModel.CurrentMoney);
-                if (GameInfo.Players[i]._playerModel.TheEnd)
-                {
-                    GameInfo.Players[i].playerPresenter.EndGame();
-                    GameInfo.Players.RemoveAt(i);
-                    i--;
-                    if (GameInfo.Players.Count == 1)
-                    {
-                        var player = GameInfo.Players[0];
-                        GameInfo.OnGetWinner(player);
-                        GameInfo.Players.Clear();
-                    }
-                }
+                GameInfo.PlayersInCurrentGame.ElementAt(i).Value.playerPresenter.EndGame();
+                var pl = GameInfo.Players.Keys.ElementAt(i);
+                GameInfo.PlayersInCurrentGame.Remove(pl);
+                GameInfo.Players.Remove(pl);
+                i--;
+                PlayerWonGame();
             }
         }
 
+
+        GameInfo.PlayersInCurrentGame.Clear();
         GameInfo.finishGame = true;
+    }
+
+    private void UpdatePlayerInfo(Player player)
+    {
+        if (player._playerModel.IsWinner)
+        {
+            player._playerModel.SetWinner(GameInfo.Result);
+        }
+        else
+        {
+            player._playerModel.SetLoser();
+        }
+
+        player.playerPresenter.ChangeMoney();
+    }
+
+    private void PlayerWonGame()
+    {
+        if (GameInfo.PlayersInCurrentGame.Count == 1)
+        {
+            var player = GameInfo.PlayersInCurrentGame.Values.ElementAt(0);
+            GameInfo.OnGetWinner(player);
+            player.playerPresenter.EndGame();
+            GameInfo.PlayersInCurrentGame.Clear();
+            GameInfo.Players.Clear();
+            
+        }
     }
 }
