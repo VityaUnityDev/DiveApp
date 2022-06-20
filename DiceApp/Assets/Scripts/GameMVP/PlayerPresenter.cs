@@ -30,7 +30,7 @@ public class PlayerPresenter : MonoBehaviour
 
     public void ChangeMoney()
     {
-        _playerView.ChangeMoney(_playerModel.CurrentMoney);
+        _playerView.ChangeMoney(_playerModel.CurrentMoney); // подумать как обьойти презентер
         ClearInfoAboutDice();
     }
 

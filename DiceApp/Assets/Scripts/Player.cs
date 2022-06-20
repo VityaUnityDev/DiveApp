@@ -18,6 +18,5 @@ public class Player : MonoBehaviour
         playerPresenter.ChangeMoney();
 
     }
-
     
 }

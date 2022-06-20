@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public static class GameInfo
 {
+    //обычный клас // публик класс для кадждого раунда //Базовый класс - > класс комнаты(подключать отключать чуваков, поставить кол-воб создавать раунды) -> классы раундов
+    // awake
     public static Dictionary<string, Player> Players = new Dictionary<string, Player>();
     public static Dictionary<string, Player> PlayersInCurrentGame = new Dictionary<string, Player>();
     public static int CountWinner;
@@ -13,6 +15,9 @@ public static class GameInfo
 
     private static float bankFees = 0;
 
+    
+    // сделать instance ыsingalton
+    
     public static event Action<Player> Winner;
     public static event Action<float> Fees;
 

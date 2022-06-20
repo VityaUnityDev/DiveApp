@@ -38,10 +38,23 @@ public class PlayerGenerator : MonoBehaviour
         _playerPresenter = new PlayerPresenter(playerView, _playerModel);
         Player player = new Player(_playerModel, _playerPresenter);
         GameInfo.Players.Add(player._playerModel.Name, player);
+        
+        
+        
         for (int i = 0; i < GameInfo.Players.Count; i++)
         {
             var pl = GameInfo.Players.ElementAt(i);
             EditPlayer(pl.Value, playerIcons[i]);
+        }
+    }
+
+    public void DestroyPlayers()
+    {
+        foreach (var place in placesInTable)
+        {
+         var pl =   place.GetComponentInChildren<PlayerView>();
+         Destroy(pl.gameObject);
+
         }
     }
 

@@ -20,10 +20,26 @@ public class GameManager : MonoBehaviour
     private int max;
     private int same;
 
+    private CountPlayerInGameCommand countPlayerInGameCommand;
+
+    private CountBetCommand countBetCommand;
+    private MakeBetCommand makeBetCommand;
+    private EndGameCommand endGameCommand;
+    private CountMoneyCommand countMoneyCommand;
+    private HandOutMoneyCommand moneyCommand;
+
+    private void Awake()
+    {
+        countPlayerInGameCommand = new CountPlayerInGameCommand();
+        countBetCommand = new CountBetCommand();
+        makeBetCommand = new MakeBetCommand();
+        endGameCommand = new EndGameCommand();
+        countMoneyCommand = new CountMoneyCommand();
+        moneyCommand = new HandOutMoneyCommand();
+    }
 
     public void CountPlayerInGame()
     {
-        CountPlayerInGameCommand countPlayerInGameCommand = new CountPlayerInGameCommand();
         countPlayerInGameCommand.Execute();
 
         MakeBet();
@@ -31,17 +47,8 @@ public class GameManager : MonoBehaviour
         RollDices();
     }
 
-    private void CountBetInGame()
-    {
-        CountBetCommand countBetCommand = new CountBetCommand();
-        countBetCommand.Execute();
-    }
-
-    private void MakeBet()
-    {
-        MakeBetCommand makeBetCommand = new MakeBetCommand();
-        makeBetCommand.Execute();
-    }
+    private void CountBetInGame() => countBetCommand.Execute();
+    private void MakeBet() => makeBetCommand.Execute();
 
     private async void RollDices()
     {
@@ -105,22 +112,15 @@ public class GameManager : MonoBehaviour
 
     private void FinishGame()
     {
-        EndGameCommand endGameCommand = new EndGameCommand();
         endGameCommand.Execute();
         CountMoney();
     }
 
     private void CountMoney()
     {
-        CountMoneyCommand countMoneyCommand = new CountMoneyCommand();
         countMoneyCommand.Execute();
         HandOutMoney();
     }
-
-
-    private void HandOutMoney()
-    {
-        HandOutMoneyCommand moneyCommand = new HandOutMoneyCommand();
-        moneyCommand.Execute();
-    }
+    
+    private void HandOutMoney() => moneyCommand.Execute();
 }

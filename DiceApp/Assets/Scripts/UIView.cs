@@ -52,6 +52,8 @@ public class UIView : MonoBehaviour
         timerActive = false;
         winnerPanel.SetActive(true);
         winnerText.text = player.Name + " Is winner";
+        _playerGenerator.DestroyPlayers();
+        
     }
 
     private void MaxBetInGame(int maxValue)
