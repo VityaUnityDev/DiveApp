@@ -23,7 +23,7 @@ public class PlayerGenerator : MonoBehaviour
 
             if (i == 1)
             {
-                CreatePlayer(playerObject, "Vitya", 10, 0);
+                CreatePlayer(playerObject, "Vitya", 30, 0);
             }
             else
             {

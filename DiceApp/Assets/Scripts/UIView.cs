@@ -12,12 +12,15 @@ public class UIView : MonoBehaviour
 {
     [SerializeField] private GameManager _gameManager;
     [SerializeField] private PlayerGenerator _playerGenerator;
+    [SerializeField] private TimeController _timeController;
 
     [SerializeField] private TMP_Text bank;
     [SerializeField] private TMP_Text currentTimeText;
     [SerializeField] private TMP_Text winnerText;
     [SerializeField] private TMP_Text bankPercent;
     [SerializeField] private TMP_Text countBet;
+    [SerializeField] private TMP_Text infoGame;
+    [SerializeField] private TMP_Text winner;
 
     [SerializeField] private Slider _slider;
 
@@ -28,11 +31,10 @@ public class UIView : MonoBehaviour
     [SerializeField] private Toggle autoBet;
 
     [SerializeField] private GameObject winnerPanel;
-    [SerializeField] float startMinutes = 0.1f;
 
 
-    public bool timerActive;
-    public float currentTime;
+    
+ 
 
 
     private void Awake()
@@ -49,54 +51,49 @@ public class UIView : MonoBehaviour
 
     private void FinishTable(Player player)
     {
-        timerActive = false;
         winnerPanel.SetActive(true);
         winnerText.text = player.Name + " Is winner";
         _playerGenerator.DestroyPlayers();
-        
+      
     }
 
     private void MaxBetInGame(int maxValue)
     {
+        GameInfo.maxBet = maxValue;
         _playerGenerator.StartGame();
         if (maxValue == 10)
         {
+            
             _slider.minValue = maxValue / 2;
+            GameInfo.minBet = (int)_slider.minValue;
+        }
+        else
+        {
+            GameInfo.minBet = 1;
         }
 
         _slider.maxValue = maxValue;
+        _timeController.StartTimer();
+        infoGame.gameObject.SetActive(false);
+    }
+
+    public void UpdateTimeText(TimeSpan timeSpan)
+    {
+        currentTimeText.text = timeSpan.Seconds.ToString();
     }
 
 
     private void Update()
     {
-        if (timerActive)
-        {
-            currentTime -= Time.deltaTime;
-            if (currentTime <= 0)
-            {
-                
-                CheckAutoGame();
-                Start();
-                currentTime = startMinutes * 60;
-            }
-            
-        }
-        
-
-
-        TimeSpan timeSpan = TimeSpan.FromSeconds(currentTime);
-        currentTimeText.text = timeSpan.Seconds.ToString();
-
-
         if (GameInfo.finishGame && GameInfo.Players.Count > 0)
         {
             Bet10.enabled = true;
-            StartTimer();
+            _timeController.StartTimer();
+            InfoGame(true);
         }
     }
 
-    private void CheckAutoGame()
+    public void CheckAutoGame()
     {
         if (autoBet.isOn)
         {
@@ -111,45 +108,65 @@ public class UIView : MonoBehaviour
 
     private void Bet(int bet)
     {
-        Start();
         var mainPlayer = GameInfo.Players.ElementAt(0);
-        GameInfo.PlayersInCurrentGame.Add(mainPlayer.Key, mainPlayer.Value);
-        GameInfo.Bet = bet;
-        GameWasStarted();
+        if (mainPlayer.Value._playerModel.CurrentMoney >= bet)
+        {
+            GameInfo.PlayersInCurrentGame.Add(mainPlayer.Key, mainPlayer.Value);
+            GameInfo.Bet = bet;
+            GameWasStarted();
+            winner.text = "";
+           
+            
+        }
+        else
+        {
+            if (GameInfo.Players.Count > 2)
+            {
+                Skip();
+            }
+        }
+
+       
+        
     }
 
     private void Skip()
     {
-      
         var randomBet = (int) Random.Range(_slider.minValue, _slider.maxValue);
         GameInfo.Bet = randomBet;
         GameWasStarted();
+        winner.text = "";
     }
 
 
     private void GameWasStarted()
     {
-        StopTimer();
+        _timeController.StopTimer();
         Bet10.enabled = false;
         _gameManager.CountPlayerInGame();
         bank.text = "Bank " + GameInfo.Result;
-      
+        _timeController.UpdateTime();
+        InfoGame(false);
     }
 
-    private void UpdateFees(float count) => bankPercent.text = "Bank fees - " + count;
-    public void StartTimer() => timerActive = true;
-    private void StopTimer() => timerActive = false;
-
-    private void Start()
+    private void UpdateFees(float count)
     {
-        currentTime = startMinutes * 60;
-       
+        bankPercent.text = "Bank fees - " + count;
     }
+
+ 
 
 
     private void OnDestroy()
     {
         GameInfo.Winner -= FinishTable;
         GameInfo.Fees -= UpdateFees;
+    }
+
+
+    private void InfoGame(bool showTimer)
+    {
+        currentTimeText.gameObject.SetActive(showTimer);
+        infoGame.gameObject.SetActive(!showTimer);
     }
 }

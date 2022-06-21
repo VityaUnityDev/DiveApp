@@ -31,7 +31,7 @@ public class PlayerModel
 
     public void MakeBet()
     {
-        if (CurrentMoney >= GameInfo.Bet)
+        if (CurrentMoney >= GameInfo.Bet )
         {
             playGame = true;
             CurrentMoney -= GameInfo.Bet;

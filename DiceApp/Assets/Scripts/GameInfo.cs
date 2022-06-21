@@ -12,6 +12,8 @@ public static class GameInfo
     public static float Bet;
     public static float Result;
     public static bool finishGame = false;
+    public static int maxBet;
+    public static int minBet;
 
     private static float bankFees = 0;
 
@@ -38,4 +40,7 @@ public static class GameInfo
         player._playerModel.DiceCount = diceResult;
         player.playerPresenter.DiceCount(diceResult);
     }
+    
+    
+    
 }

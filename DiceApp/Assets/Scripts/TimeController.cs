@@ -5,10 +5,13 @@ using UnityEngine;
 
 public class TimeController : MonoBehaviour
 {
+    [SerializeField] private UIView _uiView;
+    [SerializeField] float startMinutes = 0.1f;
     public bool timerActive;
     public float currentTime;
 
-    
+    private void Start() => UpdateTime();
+  
     private void Update()
     {
         if (timerActive)
@@ -16,7 +19,7 @@ public class TimeController : MonoBehaviour
             currentTime -= Time.deltaTime;
             if (currentTime <= 0)
             {
-                CheckAutoGame();
+                _uiView.CheckAutoGame();
                 Start();
                 currentTime = startMinutes * 60;
             }
@@ -24,16 +27,17 @@ public class TimeController : MonoBehaviour
 
 
         TimeSpan timeSpan = TimeSpan.FromSeconds(currentTime);
-        currentTimeText.text = timeSpan.Seconds.ToString();
+        _uiView.UpdateTimeText(timeSpan);
     }
-    
-    public void StartTimer() => timerActive = true;
-    private void StopTimer() => timerActive = false;
 
-    private void Start()
+    public void StartTimer() => timerActive = true;
+    public void StopTimer() => timerActive = false;
+
+    public void UpdateTime()
     {
         currentTime = startMinutes * 60;
-       
     }
 
+  
+    
 }
