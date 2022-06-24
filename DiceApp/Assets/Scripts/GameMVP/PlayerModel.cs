@@ -9,13 +9,14 @@ public class PlayerModel
     public float CurrentMoney { get; set; }
     public bool iAgreeWithBet { get; private set; }
 
-    public bool IsWinner = false;
-    public bool playGame = true;
+    public bool IsWinner;
+
+    public PlayerState currentState;
 
 
     private float probability = 10;
     private float lastBet;
-    public bool TheEnd = false;
+    public bool TheEnd;
 
 
     private int countPlayer;
@@ -31,15 +32,7 @@ public class PlayerModel
 
     public void MakeBet()
     {
-        if (CurrentMoney >= GameInfo.Bet )
-        {
-            playGame = true;
-            CurrentMoney -= GameInfo.Bet;
-        }
-        else
-        {
-            playGame = false;
-        }
+        currentState = GetPlayerState();
     }
 
     public void SolutionAboutGame()
@@ -51,7 +44,7 @@ public class PlayerModel
         if (Math.Abs(lastBet - GameInfo.Bet) > 0 && CurrentMoney > GameInfo.Bet)
         {
             var a = Random.Range(0, 10);
-            if (a < 8 || GameInfo.PlayersInCurrentGame.Count < 2 )
+            if (a < 8 || GameInfo.PlayersInCurrentGame.Count < 2)
             {
                 iAgreeWithBet = true;
             }
@@ -61,7 +54,7 @@ public class PlayerModel
                 GameInfo.Result -= GameInfo.Bet;
             }
         }
-        
+
         lastBet = GameInfo.Bet;
     }
 
@@ -79,5 +72,29 @@ public class PlayerModel
         CurrentMoney += amount;
         Debug.Log($" {Name} {DiceCount}  is winner number - Win {amount} - currentMoney {CurrentMoney}");
         IsWinner = false;
+    }
+
+    private PlayerState GetPlayerState()
+    {
+        if (iAgreeWithBet)
+        {
+            if (CurrentMoney > GameInfo.minBet && CurrentMoney < GameInfo.Bet)
+            {
+                return PlayerState.DontPlayerInCurrentGame;
+            }
+
+            if (CurrentMoney >= GameInfo.Bet)
+            {
+                CurrentMoney -= GameInfo.Bet;
+                return PlayerState.PlayCurrentGame;
+            }
+
+            if (CurrentMoney < GameInfo.minBet)
+            {
+                return PlayerState.GameOver;
+            }
+        }
+
+        return PlayerState.None;
     }
 }

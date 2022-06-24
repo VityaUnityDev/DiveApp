@@ -4,8 +4,5 @@ using UnityEngine;
 
 public class CountBetCommand : AbstractCommand
 {
-    public override void Execute()
-    {
-        GameInfo.Result = GameInfo.PlayersInCurrentGame.Count * GameInfo.Bet;
-    }
+    public override void Execute() =>   GameInfo.Result = GameInfo.PlayersInCurrentGame.Count * GameInfo.Bet;
 }

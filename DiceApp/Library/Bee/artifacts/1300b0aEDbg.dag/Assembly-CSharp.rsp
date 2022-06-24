@@ -361,6 +361,7 @@
 "Assets/Scripts/GameManager.cs"
 "Assets/Scripts/GameMVP/PlayerModel.cs"
 "Assets/Scripts/GameMVP/PlayerPresenter.cs"
+"Assets/Scripts/GameMVP/PlayerState.cs"
 "Assets/Scripts/GameMVP/PlayerView.cs"
 "Assets/Scripts/Player.cs"
 "Assets/Scripts/PlayerGenerator.cs"

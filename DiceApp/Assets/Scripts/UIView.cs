@@ -13,7 +13,6 @@ public class UIView : MonoBehaviour
     [SerializeField] private GameManager _gameManager;
     [SerializeField] private PlayerGenerator _playerGenerator;
     [SerializeField] private TimeController _timeController;
-    [SerializeField] private GameConfig _gameConfig;
 
     [SerializeField] private TMP_Text bank;
     [SerializeField] private TMP_Text currentTimeText;
@@ -65,13 +64,11 @@ public class UIView : MonoBehaviour
         _playerGenerator.StartGame();
         if (maxValue == 10)
         {
-            _gameConfig.CreateGame(TypeGame.MaxBet10);
             _slider.minValue = maxValue / 2;
             GameInfo.minBet = (int)_slider.minValue;
         }
         else
         {
-            _gameConfig.CreateGame(TypeGame.MaxBet5);
             GameInfo.minBet = 1;
         }
 

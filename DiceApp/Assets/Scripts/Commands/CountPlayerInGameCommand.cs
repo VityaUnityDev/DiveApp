@@ -9,11 +9,13 @@ public class CountPlayerInGameCommand : AbstractCommand
     {
         for (int i = 1; i < GameInfo.Players.Values.Count; i++)
         {
-            GameInfo.Players.ElementAt(i).Value._playerModel.SolutionAboutGame();
-            if (GameInfo.Players.ElementAt(i).Value._playerModel.iAgreeWithBet)
+            var player = GameInfo.Players.ElementAt(i).Value._playerModel;
+            
+            player.SolutionAboutGame();
+            if (player.iAgreeWithBet)
             {
-                var gamer = GameInfo.Players.ElementAt(i);
-                GameInfo.PlayersInCurrentGame.Add(gamer.Key, gamer.Value);
+                var currentPlayer = GameInfo.Players.ElementAt(i);
+                GameInfo.PlayersInCurrentGame.Add(currentPlayer.Key, currentPlayer.Value);
             }
         }
     }
