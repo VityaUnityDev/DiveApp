@@ -4,20 +4,8 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    private TypeGame _typeGame;
-    private int countPlayer;
-
-    public Game(TypeGame TypeGame, int CountPlayer)
-    {
-        _typeGame = TypeGame;
-        countPlayer = CountPlayer;
-        CreateNewGame();
-    }
-
-
-  
-
-    public void CreateNewGame()
+    
+    public void CreateRoom(TypeGame _typeGame, int countPlayer)
     {
         switch (_typeGame) 
         {
@@ -28,5 +16,10 @@ public class Game : MonoBehaviour
                 new CreateRoom(10, 5, countPlayer);
                 break;
         }
+    }
+
+    private void CreateGame()
+    {
+        
     }
 }

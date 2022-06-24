@@ -1464,7 +1464,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 2f92e6103bb5249529a5231ea22ad2de, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0467fc4b8b42a4ad8aa3fffc96bfab39, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1878,7 +1878,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 0467fc4b8b42a4ad8aa3fffc96bfab39, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2f92e6103bb5249529a5231ea22ad2de, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2352,6 +2352,7 @@ MonoBehaviour:
   _gameManager: {fileID: 1934739344}
   _playerGenerator: {fileID: 1157620080}
   _timeController: {fileID: 508455525}
+  _gameConfig: {fileID: 11400000, guid: 5becdec208e3f4bb080a4b272a264afa, type: 2}
   bank: {fileID: 1109044970}
   currentTimeText: {fileID: 2134484425}
   winnerText: {fileID: 237813729}
@@ -2365,8 +2366,6 @@ MonoBehaviour:
   Bet10: {fileID: 1045168892}
   autoBet: {fileID: 1794604414}
   winnerPanel: {fileID: 1458137265}
-  timerActive: 0
-  currentTime: 0
 --- !u!4 &877469218
 Transform:
   m_ObjectHideFlags: 0
