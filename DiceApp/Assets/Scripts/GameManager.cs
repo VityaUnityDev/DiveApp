@@ -1,61 +1,57 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private List<Dice> _dices;
+    [SerializeField] private List<Dice> dices;
 
 
-    private int result;
-    private int countEnter;
-    private int first;
-    private int max;
-    private int same;
+    private int _result;
+    private int _countEnter;
+    private int _first;
+    private int _max;
+    private int _same;
 
-    private CountPlayerInGameCommand countPlayerInGameCommand;
+    private CountPlayerInGameCommand _countPlayerInGameCommand;
 
-    private CountBetCommand countBetCommand;
-    private MakeBetCommand makeBetCommand;
-    private EndGameCommand endGameCommand;
-    private CountMoneyCommand countMoneyCommand;
-    private HandOutMoneyCommand moneyCommand;
+    private CountBetCommand _countBetCommand;
+    private MakeBetCommand _makeBetCommand;
+    private EndGameCommand _endGameCommand;
+    private CountMoneyCommand _countMoneyCommand;
+    private HandOutMoneyCommand _moneyCommand;
 
     private void Awake()
     {
-        countPlayerInGameCommand = new CountPlayerInGameCommand();
-        countBetCommand = new CountBetCommand();
-        makeBetCommand = new MakeBetCommand();
-        endGameCommand = new EndGameCommand();
-        countMoneyCommand = new CountMoneyCommand();
-        moneyCommand = new HandOutMoneyCommand();
+        _countPlayerInGameCommand = new CountPlayerInGameCommand();
+        _countBetCommand = new CountBetCommand();
+        _makeBetCommand = new MakeBetCommand();
+        _endGameCommand = new EndGameCommand();
+        _countMoneyCommand = new CountMoneyCommand();
+        _moneyCommand = new HandOutMoneyCommand();
     }
 
     public void CountPlayerInGame()
     {
-        countPlayerInGameCommand.Execute();
+        _countPlayerInGameCommand.Execute();
 
         MakeBet();
         CountBetInGame();
         RollDices();
     }
 
-    private void CountBetInGame() => countBetCommand.Execute();
-    private void MakeBet() => makeBetCommand.Execute();
+    private void CountBetInGame() => _countBetCommand.Execute();
+
+    private void MakeBet() => _makeBetCommand.Execute();
+
 
     private async void RollDices()
     {
         for (int i = 0; i < GameInfo.PlayersInCurrentGame.Count; i++)
         {
             int diceResult = 0;
-            foreach (var dice in _dices)
+            foreach (var dice in dices)
             {
                 var count = await dice.RollTheDice();
                 diceResult += count;
@@ -69,30 +65,30 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void FindMaxDiceNumber(int res)
+    private void FindMaxDiceNumber(int number)
     {
-        countEnter++;
-        if (countEnter == 1)
+        _countEnter++;
+        if (_countEnter == 1)
         {
-            first = res;
-            max = first;
+            _first = number;
+            _max = _first;
         }
         else
         {
-            if (first > res)
+            if (_first > number)
             {
-                first = max;
+                _first = _max;
             }
-            else if (first == res)
+            else if (_first == number)
             {
-                same = res;
-                max = same;
-                first = max;
+                _same = number;
+                _max = _same;
+                _first = _max;
             }
-            else if (first < res)
+            else if (_first < number)
             {
-                first = res;
-                max = res;
+                _first = number;
+                _max = number;
             }
         }
 
@@ -101,26 +97,26 @@ public class GameManager : MonoBehaviour
 
     private void StopCountMaxNumber()
     {
-        if (GameInfo.PlayersInCurrentGame.Count == countEnter)
+        if (GameInfo.PlayersInCurrentGame.Count == _countEnter)
         {
-            GameInfo.winnerNumber = max;
+            GameInfo.winnerNumber = _max;
             FinishGame();
-            countEnter = 0;
+            _countEnter = 0;
         }
     }
 
 
     private void FinishGame()
     {
-        endGameCommand.Execute();
+        _endGameCommand.Execute();
         CountMoney();
     }
 
     private void CountMoney()
     {
-        countMoneyCommand.Execute();
+        _countMoneyCommand.Execute();
         HandOutMoney();
     }
-    
-    private void HandOutMoney() => moneyCommand.Execute();
+
+    private void HandOutMoney() => _moneyCommand.Execute();
 }

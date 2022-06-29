@@ -4,23 +4,21 @@ using Random = UnityEngine.Random;
 
 public class PlayerModel
 {
-    public string Name { get; set; }
+    public string Name { get; }
     public int DiceCount { get; set; }
-    public float CurrentMoney { get; set; }
-    public bool iAgreeWithBet { get; private set; }
-
+    public float CurrentMoney { get;  set; }
+    public bool IAgreeWithBet { get;  set; }
+    public bool IsPlayerFinishedGame { get; private set; }
     public bool IsWinner;
-
-    public PlayerState currentState;
-
-
-    private float probability = 10;
-    private float lastBet;
-    public bool TheEnd;
-
-
-    private int countPlayer;
+    public PlayerState CurrentState;
     public event Action OnUpdatedMoney;
+
+
+  
+    private float _lastBet;
+    private int _countPlayer;
+    private float _probability = 10;
+ 
 
 
     public PlayerModel(string name, int money, int diceCount)
@@ -30,71 +28,76 @@ public class PlayerModel
         DiceCount = diceCount;
     }
 
-    public void MakeBet()
-    {
-        currentState = GetPlayerState();
-    }
+    public void MakeBet() =>   CurrentState = GetPlayerState();
 
     public void SolutionAboutGame()
     {
-        iAgreeWithBet = true;
+       // IAgreeWithBet = true;
 
-        countPlayer++;
+        _countPlayer++;
 
-        if (Math.Abs(lastBet - GameInfo.Bet) > 0 && CurrentMoney > GameInfo.Bet)
+        if (Math.Abs(_lastBet - GameInfo.Bet) > 0 && CurrentMoney > GameInfo.Bet)
         {
             var a = Random.Range(0, 10);
             if (a < 8 || GameInfo.PlayersInCurrentGame.Count < 2)
             {
-                iAgreeWithBet = true;
+                IAgreeWithBet = true;
             }
             else
             {
-                iAgreeWithBet = false;
+                IAgreeWithBet = false;
                 GameInfo.Result -= GameInfo.Bet;
             }
         }
+        else
+        {
+            IAgreeWithBet = true;
+        }
 
-        lastBet = GameInfo.Bet;
+        _lastBet = GameInfo.Bet;
     }
 
     public void SetLoser()
     {
         if (CurrentMoney <= 0)
         {
-            TheEnd = true;
+            IsPlayerFinishedGame = true;
         }
     }
 
 
-    public void SetWinner(float amount)
+    public void SetWinner()
     {
-        CurrentMoney += amount;
-        Debug.Log($" {Name} {DiceCount}  is winner number - Win {amount} - currentMoney {CurrentMoney}");
+        CurrentMoney += GameInfo.Result;
+        Debug.Log($" {Name} {DiceCount}  is winner number - Win {GameInfo.Result} - currentMoney {CurrentMoney}");
         IsWinner = false;
     }
 
     private PlayerState GetPlayerState()
     {
-        if (iAgreeWithBet)
+        if (IAgreeWithBet)
         {
-            if (CurrentMoney > GameInfo.minBet && CurrentMoney < GameInfo.Bet)
+            if (CurrentMoney > GameInfo.minBetInGame && CurrentMoney < GameInfo.Bet)
             {
+                Debug.Log("---");
                 return PlayerState.DontPlayerInCurrentGame;
             }
 
-            if (CurrentMoney >= GameInfo.Bet)
+            else if (CurrentMoney >= GameInfo.Bet)
             {
+                Debug.Log("+++");
                 CurrentMoney -= GameInfo.Bet;
                 return PlayerState.PlayCurrentGame;
             }
 
-            if (CurrentMoney < GameInfo.minBet)
+           else if (CurrentMoney < GameInfo.minBetInGame)
             {
+                Debug.Log("+--");
                 return PlayerState.GameOver;
             }
         }
 
         return PlayerState.None;
     }
+    
 }

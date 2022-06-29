@@ -9,48 +9,54 @@ public class HandOutMoneyCommand : AbstractCommand
     {
         for (int i = 0; i < GameInfo.PlayersInCurrentGame.Values.Count; i++)
         {
-            UpdatePlayerInfo(GameInfo.PlayersInCurrentGame.ElementAt(i).Value);
+            var player = GameInfo.PlayersInCurrentGame.ElementAt(i).Value;
             
-            if (GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.TheEnd)
+            UpdatePlayerInfo(player);
+            
+            if (player._playerModel.IsPlayerFinishedGame)
             {
-                GameInfo.PlayersInCurrentGame.ElementAt(i).Value.playerPresenter.EndGame();
-                var pl = GameInfo.Players.Keys.ElementAt(i);
-                GameInfo.PlayersInCurrentGame.Remove(pl);
-                GameInfo.Players.Remove(pl);
+                RemovePlayerFromRoom(player);
                 i--;
-                PlayerWonGame();
+                RoomWasFinished();
             }
         }
-
-
+        
         GameInfo.PlayersInCurrentGame.Clear();
         GameInfo.finishGame = true;
     }
 
     private void UpdatePlayerInfo(Player player)
     {
-        if (player._playerModel.IsWinner)
+        var pl = player._playerModel;
+        if (pl.IsWinner)
         {
-            player._playerModel.SetWinner(GameInfo.Result);
+           pl.SetWinner();
         }
         else
         {
-            player._playerModel.SetLoser();
+          pl.SetLoser();
         }
 
         player.playerPresenter.ChangeMoney();
     }
 
-    private void PlayerWonGame()
+    private void RoomWasFinished()
     {
-        if (GameInfo.PlayersInCurrentGame.Count == 1)
+        if (GameInfo.Players.Count == 1)
         {
-            var player = GameInfo.PlayersInCurrentGame.Values.ElementAt(0);
+            var player = GameInfo.Players.Values.ElementAt(0);
             GameInfo.OnGetWinner(player);
             player.playerPresenter.EndGame();
             GameInfo.PlayersInCurrentGame.Clear();
             GameInfo.Players.Clear();
             
         }
+    }
+
+    private void RemovePlayerFromRoom(Player player)
+    {
+        player.playerPresenter.EndGame();
+        GameInfo.PlayersInCurrentGame.Remove(player.Name);
+        GameInfo.Players.Remove(player.Name);
     }
 }

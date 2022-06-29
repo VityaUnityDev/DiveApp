@@ -12,7 +12,7 @@ public class CountPlayerInGameCommand : AbstractCommand
             var player = GameInfo.Players.ElementAt(i).Value._playerModel;
             
             player.SolutionAboutGame();
-            if (player.iAgreeWithBet)
+            if (player.IAgreeWithBet)
             {
                 var currentPlayer = GameInfo.Players.ElementAt(i);
                 GameInfo.PlayersInCurrentGame.Add(currentPlayer.Key, currentPlayer.Value);

@@ -2352,7 +2352,6 @@ MonoBehaviour:
   _gameManager: {fileID: 1934739344}
   _playerGenerator: {fileID: 1157620080}
   _timeController: {fileID: 508455525}
-  _gameConfig: {fileID: 11400000, guid: 5becdec208e3f4bb080a4b272a264afa, type: 2}
   bank: {fileID: 1109044970}
   currentTimeText: {fileID: 2134484425}
   winnerText: {fileID: 237813729}
@@ -5185,9 +5184,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0284cbef2f1624a5cb4f5b4c09853b7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _dices:
-  - {fileID: 439524006}
+  dices:
   - {fileID: 690314919}
+  - {fileID: 439524006}
 --- !u!4 &1934739345
 Transform:
   m_ObjectHideFlags: 0

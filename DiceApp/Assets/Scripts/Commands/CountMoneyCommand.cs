@@ -4,22 +4,20 @@ using UnityEngine;
 
 public class CountMoneyCommand : AbstractCommand
 {
-    public float amount;
-
-    private float CasinoAmount;
+    private float _casinoAmount;
     private int percentForCasino = 10;
 
     public override void Execute()
     {
-        amount = GameInfo.Bet *
+      var  amount = GameInfo.Bet *
                  GameInfo.PlayersInCurrentGame.Count;
 
 
         if (GameInfo.PlayersInCurrentGame.Count > 1)
         {
             var fees = amount * percentForCasino / 100;
-            CasinoAmount += fees;
-            GameInfo.OnGetFees(CasinoAmount);
+            _casinoAmount += fees;
+            GameInfo.OnGetFees(_casinoAmount);
             var result = amount - fees;
             GameInfo.Result = result;
             if (GameInfo.CountWinner > 1)
@@ -28,4 +26,5 @@ public class CountMoneyCommand : AbstractCommand
             }
         }
     }
+    
 }

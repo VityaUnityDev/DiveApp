@@ -16,9 +16,7 @@ public class EndGameCommand : AbstractCommand
                 countWinner++;
             }
         }
-        
+
         GameInfo.CountWinner = countWinner;
-       
     }
-    
 }

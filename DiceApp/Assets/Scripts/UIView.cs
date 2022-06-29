@@ -33,15 +33,12 @@ public class UIView : MonoBehaviour
     [SerializeField] private GameObject winnerPanel;
 
 
-    
- 
-
-
     private void Awake()
     {
         MaxBet5.onClick.AddListener(() => MaxBetInGame(5));
         MaxBet10.onClick.AddListener(() => MaxBetInGame(10));
-        Bet10.onClick.AddListener(() => Bet((int) _slider.value));
+        
+        Bet10.onClick.AddListener(() => Bet((int)_slider.value));
         _slider.onValueChanged.AddListener((v) => { countBet.text = _slider.value.ToString(); });
 
         GameInfo.Winner += FinishTable;
@@ -54,22 +51,20 @@ public class UIView : MonoBehaviour
         winnerPanel.SetActive(true);
         winnerText.text = player.Name + " Is winner";
         _playerGenerator.DestroyPlayers();
-      
     }
 
     private void MaxBetInGame(int maxValue)
     {
-       
-        GameInfo.maxBet = maxValue;
+        GameInfo.maxBetInGame = maxValue;
         _playerGenerator.StartGame();
         if (maxValue == 10)
         {
             _slider.minValue = maxValue / 2;
-            GameInfo.minBet = (int)_slider.minValue;
+            GameInfo.minBetInGame = (int)_slider.minValue;
         }
         else
         {
-            GameInfo.minBet = 1;
+            GameInfo.minBetInGame = 1;
         }
 
         _slider.maxValue = maxValue;
@@ -97,7 +92,7 @@ public class UIView : MonoBehaviour
     {
         if (autoBet.isOn)
         {
-            Bet((int) _slider.value);
+            Bet((int)_slider.value);
         }
         else
         {
@@ -108,31 +103,31 @@ public class UIView : MonoBehaviour
 
     private void Bet(int bet)
     {
-        var mainPlayer = GameInfo.Players.ElementAt(0);
-        if (mainPlayer.Value._playerModel.CurrentMoney >= bet)
+        if (bet <= GameInfo.maxBetInGame)
         {
-            GameInfo.PlayersInCurrentGame.Add(mainPlayer.Key, mainPlayer.Value);
-            GameInfo.Bet = bet;
-            GameWasStarted();
-            winner.text = "";
-           
-            
-        }
-        else
-        {
-            if (GameInfo.Players.Count > 2)
+            var mainPlayer = GameInfo.Players.ElementAt(0);
+            if (mainPlayer.Value._playerModel.CurrentMoney >= bet)
             {
-                Skip();
+                mainPlayer.Value._playerModel.IAgreeWithBet = true;
+                GameInfo.PlayersInCurrentGame.Add(mainPlayer.Key, mainPlayer.Value);
+                GameInfo.Bet = bet;
+                GameWasStarted();
+                winner.text = "";
+            }
+            else
+            {
+                if (GameInfo.Players.Count >= 3)
+                {
+                    Skip();
+                }
             }
         }
-
-       
-        
     }
 
     private void Skip()
     {
-        var randomBet = (int) Random.Range(_slider.minValue, _slider.maxValue);
+        //понмить о том что в первой игре нельзя ливнуть
+        var randomBet = (int)Random.Range(GameInfo.minBetInGame, GameInfo.maxBetInGame);
         GameInfo.Bet = randomBet;
         GameWasStarted();
         winner.text = "";
@@ -153,8 +148,6 @@ public class UIView : MonoBehaviour
     {
         bankPercent.text = "Bank fees - " + count;
     }
-
- 
 
 
     private void OnDestroy()

@@ -7,6 +7,7 @@ using UnityEngine;
 public class MakeBetCommand : AbstractCommand
 {
     private PlayerState _playerState;
+
     public override void Execute()
     {
         GameInfo.finishGame = false;
@@ -16,28 +17,22 @@ public class MakeBetCommand : AbstractCommand
             var player = GameInfo.PlayersInCurrentGame.ElementAt(i).Value;
             player._playerModel.MakeBet();
 
-            switch (player._playerModel.currentState)
+            switch (player._playerModel.CurrentState)
             {
-                case PlayerState.PlayCurrentGame: 
-                    player.playerPresenter.ChangeMoney();
+                case PlayerState.PlayCurrentGame:
+                    UpdateMoney(player);
                     break;
-                case PlayerState.DontPlayerInCurrentGame: 
-                    RemovePlayerFromGame(player);
-                    i--;
-                    break; 
-                case PlayerState.GameOver:   
+                case PlayerState.DontPlayerInCurrentGame:
                     RemovePlayerFromCurrentGame(player);
                     i--;
                     break;
-                    
+                case PlayerState.GameOver:
+                    RemovePlayerFromGame(player);
+                    i--;
+                    break;
             }
-            
-            if (GameInfo.Players.Count == 1)
-            {
-                var pl = GameInfo.Players.ElementAt(0).Value;
-                GameInfo.OnGetWinner(pl);
-                GameInfo.Players.Clear();
-            }
+
+          
 
             // if (GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.playGame)
             // {
@@ -54,8 +49,6 @@ public class MakeBetCommand : AbstractCommand
             //   
             // }
         }
-        
-       
     }
 
     private void RemovePlayerFromCurrentGame(Player player) => GameInfo.PlayersInCurrentGame.Remove(player.Name);
@@ -66,4 +59,8 @@ public class MakeBetCommand : AbstractCommand
         GameInfo.PlayersInCurrentGame.Remove(player.Name);
         GameInfo.Players.Remove(player.Name);
     }
+
+    private void UpdateMoney(Player player) => player.playerPresenter.ChangeMoney();
+    
+   
 }
