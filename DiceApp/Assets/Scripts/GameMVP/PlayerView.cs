@@ -13,6 +13,8 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private TMP_Text currentMoney;
     [SerializeField] private TMP_Text currentDice;
 
+    [SerializeField] public DicesInfo dicesInfo;
+
 
     public void InstallPhoto(Sprite image)
     {
@@ -20,7 +22,7 @@ public class PlayerView : MonoBehaviour
     }
     public void ChangeMoney(float count)
     {
-        currentMoney.text = count.ToString();
+        currentMoney.text = count.ToString() + "$";
     }
 
     public void DiceCount(int count)
@@ -46,6 +48,9 @@ public class PlayerView : MonoBehaviour
         var update = 0;
         currentDice.text = update.ToString();
     }
+    
+    
+    
 
   
 

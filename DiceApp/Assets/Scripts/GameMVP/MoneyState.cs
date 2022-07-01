@@ -1,4 +1,4 @@
-public enum PlayerState
+public enum MoneyState
 {
     PlayCurrentGame,
     DontPlayerInCurrentGame,

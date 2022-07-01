@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class MakeBetCommand : AbstractCommand
 {
-    private PlayerState _playerState;
+    private MoneyState _moneyState;
 
     public override void Execute()
     {
@@ -19,35 +19,18 @@ public class MakeBetCommand : AbstractCommand
 
             switch (player._playerModel.CurrentState)
             {
-                case PlayerState.PlayCurrentGame:
+                case MoneyState.PlayCurrentGame:
                     UpdateMoney(player);
                     break;
-                case PlayerState.DontPlayerInCurrentGame:
+                case MoneyState.DontPlayerInCurrentGame:
                     RemovePlayerFromCurrentGame(player);
                     i--;
                     break;
-                case PlayerState.GameOver:
+                case MoneyState.GameOver:
                     RemovePlayerFromGame(player);
                     i--;
                     break;
             }
-
-          
-
-            // if (GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.playGame)
-            // {
-            //  
-            // }
-            //
-            // else if (GameInfo.PlayersInCurrentGame.ElementAt(i).Value._playerModel.CurrentMoney < GameInfo.minBet)
-            // {
-            //   
-            // }
-            //
-            // else
-            // {
-            //   
-            // }
         }
     }
 
@@ -60,7 +43,9 @@ public class MakeBetCommand : AbstractCommand
         GameInfo.Players.Remove(player.Name);
     }
 
-    private void UpdateMoney(Player player) => player.playerPresenter.ChangeMoney();
-    
-   
+    private void UpdateMoney(Player player)
+    {
+        player._playerModel.CurrentMoney -= GameInfo.Bet;
+        player.playerPresenter.ChangeMoney();
+    }
 }

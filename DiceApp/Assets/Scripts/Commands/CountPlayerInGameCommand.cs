@@ -16,6 +16,8 @@ public class CountPlayerInGameCommand : AbstractCommand
             {
                 var currentPlayer = GameInfo.Players.ElementAt(i);
                 GameInfo.PlayersInCurrentGame.Add(currentPlayer.Key, currentPlayer.Value);
+                
+                
             }
         }
     }

@@ -6,19 +6,20 @@ public class PlayerModel
 {
     public string Name { get; }
     public int DiceCount { get; set; }
-    public float CurrentMoney { get;  set; }
-    public bool IAgreeWithBet { get;  set; }
+    public float CurrentMoney { get; set; }
+    public bool IAgreeWithBet { get; set; }
     public bool IsPlayerFinishedGame { get; private set; }
     public bool IsWinner;
-    public PlayerState CurrentState;
+    
+    public MoneyState CurrentState;
     public event Action OnUpdatedMoney;
 
 
-  
     private float _lastBet;
     private int _countPlayer;
     private float _probability = 10;
- 
+
+    private PlayerMoneyState _playerMoneyState;
 
 
     public PlayerModel(string name, int money, int diceCount)
@@ -28,15 +29,15 @@ public class PlayerModel
         DiceCount = diceCount;
     }
 
-    public void MakeBet() =>   CurrentState = GetPlayerState();
+    public void MakeBet()
+    {
+        _playerMoneyState = new PlayerMoneyState(CurrentMoney);
+        CurrentState = _playerMoneyState.MoneyState;
+    }
 
     public void SolutionAboutGame()
     {
-       // IAgreeWithBet = true;
-
-        _countPlayer++;
-
-        if (Math.Abs(_lastBet - GameInfo.Bet) > 0 && CurrentMoney > GameInfo.Bet)
+        if (Math.Abs(_lastBet - GameInfo.Bet) > 0 && CurrentState == MoneyState.PlayCurrentGame)
         {
             var a = Random.Range(0, 10);
             if (a < 8 || GameInfo.PlayersInCurrentGame.Count < 2)
@@ -71,33 +72,6 @@ public class PlayerModel
         CurrentMoney += GameInfo.Result;
         Debug.Log($" {Name} {DiceCount}  is winner number - Win {GameInfo.Result} - currentMoney {CurrentMoney}");
         IsWinner = false;
-    }
-
-    private PlayerState GetPlayerState()
-    {
-        if (IAgreeWithBet)
-        {
-            if (CurrentMoney > GameInfo.minBetInGame && CurrentMoney < GameInfo.Bet)
-            {
-                Debug.Log("---");
-                return PlayerState.DontPlayerInCurrentGame;
-            }
-
-            else if (CurrentMoney >= GameInfo.Bet)
-            {
-                Debug.Log("+++");
-                CurrentMoney -= GameInfo.Bet;
-                return PlayerState.PlayCurrentGame;
-            }
-
-           else if (CurrentMoney < GameInfo.minBetInGame)
-            {
-                Debug.Log("+--");
-                return PlayerState.GameOver;
-            }
-        }
-
-        return PlayerState.None;
     }
     
 }

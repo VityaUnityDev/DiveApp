@@ -12,6 +12,7 @@ public class PlayerGenerator : MonoBehaviour
 
     private PlayerPresenter _playerPresenter;
     private PlayerModel _playerModel;
+    private PlayerView playerView;
 
     public void StartGame()
     {
@@ -36,7 +37,8 @@ public class PlayerGenerator : MonoBehaviour
     {
         _playerModel = new PlayerModel(playerName, money, diceCount);
         _playerPresenter = new PlayerPresenter(playerView, _playerModel);
-        Player player = new Player(_playerModel, _playerPresenter);
+
+        Player player = new Player(_playerModel, _playerPresenter, playerView);
         GameInfo.Players.Add(player._playerModel.Name, player);
         
         
